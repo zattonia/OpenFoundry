@@ -37,6 +37,3 @@
     "monaco-editor": "^0.55.1"
   }
 }
-"scripts": {
-  "build": "svelte-kit sync && vite build"
-}

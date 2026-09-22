@@ -9,10 +9,14 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
 
-# Installazione dipendenze
-RUN pnpm install --frozen-lockfile
+# Consente l'esecuzione degli script di build nativi (esbuild)
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
-# Copia dei sorgenti
+# Installa consentendo l'esecuzione di script di terze parti
+RUN pnpm install --no-frozen-lockfile --unsafe-perm
+
+# Copia i sorgenti
 COPY . .
 
 # Build dell'applicazione web

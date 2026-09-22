@@ -2,30 +2,21 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Installazione di pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 # Copia dei file di configurazione
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
 
-# Consente l'esecuzione degli script di build nativi (esbuild)
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+# Installazione dipendenze tramite npm
+RUN npm install --legacy-peer-deps
 
-# Installa consentendo l'esecuzione di script di terze parti
-RUN pnpm install --no-frozen-lockfile --unsafe-perm
-
-# Copia i sorgenti
+# Copia dei sorgenti
 COPY . .
 
 # Build dell'applicazione web
-RUN pnpm --filter @open-foundry/web build
+RUN npx pnpm --filter @open-foundry/web build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY --from=builder /app ./
 
